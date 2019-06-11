@@ -83,10 +83,11 @@ var questionsAnswers = [
         correctAnswer: "Tatooine"
     },
 ];
-// Create a count that will keep track of time (timer) -- Start at 30 and subtract, once it runs out, score is calculated
-var time = 60;
+// Create a timer that will keep track of time (timer) -- Start at 30 and subtract, once it runs out, score is calculated
+var time = 10;
 var timerStarted = false;
 var intervalId;
+var done = false;
 // number of right questions
 var correct = 0;
 // number of wrong questions
@@ -102,37 +103,49 @@ var unanswered = 0;
 // Reset function for player to start over if so desired
 // Start function to go to next screen
 
-function count() {
-
+function timer() {
     if (timerStarted) {
         time--;
     }
 
     var displayTimer = timeConverter(time);
+    console.log("Time left: " + time);
 
     $("#display-timer").text(displayTimer);
+   
+    doneButton();
+
+    if(time===0 || done){
+        writeToPage(scoreScreen);
+        stopTimer();
+    }
 }
+
 
 function startTimer() {
     if (!timerStarted) {
-        intervalId = setInterval(count, 1000);
+        intervalId = setInterval(timer, 1000);
         timerStarted = true;
     }
 }
 
+
 function stopTimer() {
-    if (timerStarted && time === 0) {
+    if (timerStarted && time <= 0) {
         clearInterval(intervalId);
         timerStarted = false;
     }
 }
 
+
 function writeToPage(toWrite) {
     $("#overwrite").html(toWrite);
 }
 
+
 function questionsScreen() {
     startTimer();
+    // doneButton();
     var questionSection = $("<div>").attr({
         class: "form",
         id: "question-section"
@@ -157,16 +170,26 @@ function questionsScreen() {
 
         questionSection.append(q, "<br>");
     }
-
-    return questionSection.append(doneButton());
+    return questionSection;
+    // CALL GRADE ANSWERS FUNCTION
+    // CALL WRITE TO PAGE FUNCTION WITH SCORESCREEN FUNCTION IN ITS PARAMETERS TO DISPLAY THE NEXT SCREEN/SCORESCREEN
 }
+
 
 function gradeAnswers() {    // CHECK IF THE RADIO BUTTONS SELECTED MATCH THE CORRECT ANSWER. IF SO 'right++', ELSE IF WRONG 'wrong++', ELSE 'unanswered++'
 
 }
 
-function scoreScreen() { // OVERWRITE THE LAST SCREEN AND DISPLAY THE FINAL SCORES
 
+function scoreScreen() { // OVERWRITE THE LAST SCREEN AND DISPLAY THE FINAL SCORES
+    var scores = $("<div>");
+    var correctP = $("<p>").text("Right: " + correct);
+    var wrongP = $("<p>").text("Wrong: " + wrong);
+    var unansweredP = $("<p>").text("Unanswered: " + unanswered);
+
+    $("button").remove();
+
+    return scores.append(correctP, wrongP, unansweredP);
 }
 
 
@@ -184,14 +207,15 @@ function displayAnswers(currPosition, element, ans) {  //
 
 
 function doneButton() {
-    var done = $("<button>").attr({
+    var doneB = $("button").attr({
         class: "button",
         id: "done"
     });
 
-    done.text("DONE");
+    doneB.text("DONE");
+    // done = true;
 
-    return done;
+    return doneB;
 }
 
 
@@ -232,20 +256,32 @@ function timeConverter(t) {
 // Start the timer countdown once start is pressed: Count-- per second
 
 // Form calls on the object items and their properties to retrieve and display each question and its corresponding answers
-// While? count > 0 
+// While? timer > 0 
 // timesUp = true
-// if count > 0
-// timesUp = false ------> every loop while count > 0 to keep the while loop running/avoid going to the next screen (Score)
-// count--;
+// if timer > 0
+// timesUp = false ------> every loop while timer > 0 to keep the while loop running/avoid going to the next screen (Score)
+// timer--;
 // When timesUp = true, go to next screen and calculate right, wrong, and unanswered questions
 
 
-$("button").on("click", function () {
+$("#start").on("click", function (event) {
     // alert(questionsAnswers[0].correctAnswer);
+    if(!done){
 
-    writeToPage(questionsScreen());
+        writeToPage(questionsScreen());
+        // doneButton();
+    }
+        var currentButton = $(this).attr("id");
+        
+    if(currentButton === "done" && !done){
+        console.log(currentButton);
+        done = true;
+    }
 });
 
-$("button").on("click", ".button", function () {
-    alert("werks");
-});
+// $("#done").on("click", function(){
+//     done = true;
+// });
+
+
+
