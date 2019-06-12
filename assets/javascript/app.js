@@ -84,7 +84,7 @@ var questionsAnswers = [
     },
 ];
 // Create a timer that will keep track of time (timer) -- Start at 30 and subtract, once it runs out, score is calculated
-var time = 10;
+var time = 60;
 var timerStarted = false;
 var intervalId;
 var done = false;
@@ -112,12 +112,13 @@ function timer() {
     console.log("Time left: " + time);
 
     $("#display-timer").text(displayTimer);
-   
+
     doneButton();
 
-    if(time===0 || done){
-        writeToPage(scoreScreen);
+    if (time === 0 || done) {
+        gradeAnswers();
         stopTimer();
+        writeToPage(scoreScreen);
     }
 }
 
@@ -131,7 +132,7 @@ function startTimer() {
 
 
 function stopTimer() {
-    if (timerStarted && time <= 0) {
+    if (timerStarted || time <= 0) {
         clearInterval(intervalId);
         timerStarted = false;
     }
@@ -145,8 +146,7 @@ function writeToPage(toWrite) {
 
 function questionsScreen() {
     startTimer();
-    // doneButton();
-    var questionSection = $("<div>").attr({
+    var questionSection = $("<form>").attr({
         class: "form",
         id: "question-section"
     })
@@ -154,18 +154,9 @@ function questionsScreen() {
 
     questionSection.append(displayTime);
     for (var i = 0; i < questionsAnswers.length; i++) {
-        var q = $("<div>").addClass("question").attr("data-value", questionsAnswers[i].questionNumber).html("<p>" + questionsAnswers[i].question + "</p>");
+        var q = $("<div>").addClass("question").attr("id", questionsAnswers[i].questionNumber).attr("data-value", questionsAnswers[i].questionNumber).html("<p>" + questionsAnswers[i].question + "</p>");
         var ans = questionsAnswers[i].answers;
 
-        // for (var j = 0; j < ans.length; j++) {
-        //     var a = $("<input>").addClass("answer").attr({
-        //         type: "radio",
-        //         name: questionsAnswers[i].questionNumber + "-answer"
-        //     }).attr("data-value", questionsAnswers[i].answers[j]);
-        //     var ansText = questionsAnswers[i].answers[j];
-
-        //     q.append(a, ansText);
-        // }
         displayAnswers(i, q, ans);
 
         questionSection.append(q, "<br>");
@@ -177,6 +168,25 @@ function questionsScreen() {
 
 
 function gradeAnswers() {    // CHECK IF THE RADIO BUTTONS SELECTED MATCH THE CORRECT ANSWER. IF SO 'right++', ELSE IF WRONG 'wrong++', ELSE 'unanswered++'
+
+    var q = $('input:radio[name="q1"]:checked').val();
+    for (var i = 0; i < questionsAnswers.length; i++) {
+        var currentQuestion = $('input:radio[name="q'+ (i+1) +'-answer"]:checked').val();
+        console.log("curr q: " + currentQuestion);
+
+        if (currentQuestion === questionsAnswers[i].correctAnswer) {
+            correct++;
+        } else if (currentQuestion != questionsAnswers[i].correctAnswer) {
+            wrong++;
+        } else {
+            unanswered++;
+        }
+
+        console.log("Right: " + correct);
+        console.log("Wrong: " + wrong);
+        console.log("Unanswered: " + unanswered);
+    }
+     return questionsAnswers.length;
 
 }
 
@@ -193,11 +203,12 @@ function scoreScreen() { // OVERWRITE THE LAST SCREEN AND DISPLAY THE FINAL SCOR
 }
 
 
-function displayAnswers(currPosition, element, ans) {  //
+function displayAnswers(currPosition, element, ans) {  // CODE TO DISPLAY ANSWERS
     for (var j = 0; j < ans.length; j++) {
         var a = $("<input>").addClass("answer").attr({
             type: "radio",
-            name: questionsAnswers[currPosition].questionNumber + "-answer"
+            name: questionsAnswers[currPosition].questionNumber + "-answer",
+            id: questionsAnswers[currPosition].answers[j]
         }).attr("data-value", questionsAnswers[currPosition].answers[j]);
         var ansText = questionsAnswers[currPosition].answers[j];
 
@@ -209,7 +220,8 @@ function displayAnswers(currPosition, element, ans) {  //
 function doneButton() {
     var doneB = $("button").attr({
         class: "button",
-        id: "done"
+        id: "done",
+        type: "submit" // <=================================================== changed -- test to to get values from form/questions
     });
 
     doneB.text("DONE");
@@ -266,18 +278,22 @@ function timeConverter(t) {
 
 $("#start").on("click", function (event) {
     // alert(questionsAnswers[0].correctAnswer);
-    if(!done){
+    if (!done) {
 
         writeToPage(questionsScreen());
         // doneButton();
     }
-        var currentButton = $(this).attr("id");
-        
-    if(currentButton === "done" && !done){
+    var currentButton = $(this).attr("id");
+
+    if (currentButton === "done" && !done) {
         console.log(currentButton);
         done = true;
     }
 });
+
+// $(document).ready(function(){
+
+// })
 
 // $("#done").on("click", function(){
 //     done = true;

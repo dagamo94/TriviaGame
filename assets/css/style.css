@@ -1,0 +1,28 @@
+.answer{
+    margin-left: 30px;
+}
+
+.container{
+    margin-top: 100px;
+    margin-bottom: 100px;
+    padding: 50px 50px;
+    border-radius: 50px;
+    border: 10px solid white;
+    background-color: rgba(100, 100, 100, .5)
+}
+
+body{
+    background-color: black;
+    background-image: url('../images/Image-0-Header-1536x864-863587051769.jpg');
+    /* background-repeat: no-repeat; */
+    background-size: 100%; 
+}
+
+#display-timer{
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.question{
+    font-weight: 500;
+}
